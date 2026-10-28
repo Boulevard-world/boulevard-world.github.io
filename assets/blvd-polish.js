@@ -69,11 +69,16 @@
     // Soft header elevation on scroll
     const header = document.querySelector('header.sticky, header.no-print');
     if (header) {
+      let __blvdScrollRaf = 0;
       const onScroll = () => {
-        header.style.boxShadow =
-          window.scrollY > 8
-            ? '0 12px 36px -18px rgba(0,0,0,0.9), 0 0 0 1px rgba(195,62,111,0.12)'
-            : '';
+        if (__blvdScrollRaf) return;
+        __blvdScrollRaf = requestAnimationFrame(() => {
+          __blvdScrollRaf = 0;
+          header.style.boxShadow =
+            window.scrollY > 8
+              ? '0 12px 36px -18px rgba(0,0,0,0.9), 0 0 0 1px rgba(195,62,111,0.12)'
+              : '';
+        });
       };
       onScroll();
       window.addEventListener('scroll', onScroll, { passive: true });
@@ -95,9 +100,13 @@
     reapply();
     return r;
   };
+})();
 
 (function(){
   var TITLE='أسبانيا', SUB='منطقة أسبانيا';
+  var __blvdHeroBusy=false;
+  var __blvdHeroRaf=0;
+  var __blvdHeroMo=null;
   function build(){
     var wrap=document.createElement('div');
     wrap.className='blvd-hero-spain';
@@ -116,16 +125,35 @@
   }
   function paint(el){
     if(!el) return;
-    el.style.opacity='1'; el.style.visibility='visible';
-    el.style.background='#1f1f22'; el.style.backgroundColor='#1f1f22';
-    el.style.color='#ffffff'; el.classList.remove('blvd-reveal');
+    if(el.style.opacity!=='1') el.style.opacity='1';
+    if(el.style.visibility!=='visible') el.style.visibility='visible';
+    if(el.style.backgroundColor!=='rgb(31, 31, 34)' && el.style.background!=='#1f1f22'){
+      el.style.background='#1f1f22'; el.style.backgroundColor='#1f1f22';
+    }
+    if(el.style.color!=='rgb(255, 255, 255)' && el.style.color!=='#ffffff') el.style.color='#ffffff';
+    el.classList.remove('blvd-reveal');
     var tt=el.querySelector('.blvd-hero-spain-title');
     var ss=el.querySelector('.blvd-hero-spain-sub');
-    if(tt){ tt.textContent=TITLE; tt.style.opacity='1'; tt.style.visibility='visible'; tt.style.color='#ffffff'; tt.style.webkitTextFillColor='#ffffff'; }
-    if(ss){ ss.textContent=SUB; ss.style.opacity='1'; ss.style.visibility='visible'; ss.style.color='#e9e9e9'; ss.style.webkitTextFillColor='#e9e9e9'; }
+    if(tt){
+      if(tt.textContent!==TITLE) tt.textContent=TITLE;
+      if(tt.style.opacity!=='1') tt.style.opacity='1';
+      if(tt.style.visibility!=='visible') tt.style.visibility='visible';
+      if(tt.style.color!=='#ffffff' && tt.style.color!=='rgb(255, 255, 255)') tt.style.color='#ffffff';
+      tt.style.webkitTextFillColor='#ffffff';
+    }
+    if(ss){
+      if(ss.textContent!==SUB) ss.textContent=SUB;
+      if(ss.style.opacity!=='1') ss.style.opacity='1';
+      if(ss.style.visibility!=='visible') ss.style.visibility='visible';
+      if(ss.style.color!=='#e9e9e9' && ss.style.color!=='rgb(233, 233, 233)') ss.style.color='#e9e9e9';
+      ss.style.webkitTextFillColor='#e9e9e9';
+    }
   }
   function ensure(){
+    if(__blvdHeroBusy) return;
+    __blvdHeroBusy=true;
     try{
+      if(__blvdHeroMo){ try{ __blvdHeroMo.disconnect(); }catch(e){} }
       var existing=document.querySelector('.blvd-hero-spain');
       if(existing){ paint(existing); return; }
       var main=document.querySelector('main#top, main');
@@ -143,16 +171,29 @@
         if(col) col.insertBefore(wrap, col.firstChild);
       }
     }catch(e){}
+    finally{
+      __blvdHeroBusy=false;
+      if(__blvdHeroMo){
+        try{ __blvdHeroMo.observe(document.documentElement,{childList:true,subtree:true}); }catch(e){}
+      }
+    }
+  }
+  function schedule(){
+    if(__blvdHeroRaf) return;
+    __blvdHeroRaf=requestAnimationFrame(function(){
+      __blvdHeroRaf=0;
+      ensure();
+    });
   }
   ensure();
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', ensure);
-  setTimeout(ensure, 0);
-  setTimeout(ensure, 250);
-  setTimeout(ensure, 1000);
-  setTimeout(ensure, 2500);
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', schedule);
+  setTimeout(schedule, 0);
+  setTimeout(schedule, 250);
+  setTimeout(schedule, 1000);
+  setTimeout(schedule, 2500);
   try{
-    var mo=new MutationObserver(function(){ ensure(); });
-    mo.observe(document.documentElement,{childList:true,subtree:true});
-    setTimeout(function(){ try{mo.disconnect();}catch(e){} }, 8000);
+    __blvdHeroMo=new MutationObserver(function(){ schedule(); });
+    __blvdHeroMo.observe(document.documentElement,{childList:true,subtree:true});
+    setTimeout(function(){ try{ if(__blvdHeroMo) __blvdHeroMo.disconnect(); __blvdHeroMo=null; }catch(e){} }, 8000);
   }catch(e){}
 })();
