@@ -1,0 +1,267 @@
+/* Blvd World — visual polish overlay (no content removed) */
+@import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap");
+
+:root {
+  --blvd-radius: 1rem;
+  --blvd-radius-sm: 0.75rem;
+  --blvd-shadow: 0 10px 40px -12px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --blvd-shadow-hover: 0 18px 50px -14px rgba(195, 62, 111, 0.35), 0 0 0 1px rgba(225, 94, 41, 0.18);
+  --blvd-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --blvd-crimson: #c33e6f;
+  --blvd-gold: #e15e29;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Tajawal", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif !important;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Keep latin/display accents but soften overall rhythm */
+.latin {
+  letter-spacing: 0.08em;
+}
+
+.font-display,
+[class*="font-display"] {
+  letter-spacing: -0.02em;
+}
+
+/* Header polish */
+header.sticky,
+header.no-print {
+  border-bottom-color: color-mix(in srgb, var(--color-line) 70%, transparent) !important;
+  background: color-mix(in srgb, var(--color-paper) 88%, transparent) !important;
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 8px 30px -20px rgba(0, 0, 0, 0.8);
+  transition: box-shadow 0.35s var(--blvd-ease), background 0.35s var(--blvd-ease);
+}
+
+header nav a,
+header a.shrink-0 {
+  border-radius: 999px;
+  transition: color 0.25s var(--blvd-ease), background 0.25s var(--blvd-ease), transform 0.25s var(--blvd-ease);
+}
+
+header nav a:hover,
+header a.shrink-0:hover {
+  background: rgba(195, 62, 111, 0.12);
+  transform: translateY(-1px);
+}
+
+/* Dossier container breathing room on mobile */
+.dossier {
+  width: min(72rem, calc(100% - 1.25rem)) !important;
+}
+
+@media (min-width: 768px) {
+  .dossier {
+    width: min(72rem, calc(100% - 2.5rem)) !important;
+  }
+}
+
+/* Cards / bordered panels → soft elevation */
+main .border.border-line,
+main [class*="border-line"].bg-paper-2,
+main .portrait,
+section .border.border-line,
+.border.border-line.bg-paper-2,
+.border.border-line.p-5,
+blockquote.border-s-2 {
+  border-radius: var(--blvd-radius) !important;
+  box-shadow: var(--blvd-shadow);
+  transition: transform 0.35s var(--blvd-ease), box-shadow 0.35s var(--blvd-ease), border-color 0.35s var(--blvd-ease);
+}
+
+main .portrait,
+main img.object-cover {
+  border-radius: var(--blvd-radius);
+}
+
+main .portrait {
+  overflow: hidden;
+}
+
+/* Hover lift for interactive cards/buttons/links that look like cards */
+a.border,
+button.border,
+main a.bg-crimson,
+main a[class*="bg-crimson"],
+button[class*="bg-crimson"],
+main button.border-line,
+section a.border-line {
+  transition: transform 0.28s var(--blvd-ease), box-shadow 0.28s var(--blvd-ease), background-color 0.28s var(--blvd-ease), border-color 0.28s var(--blvd-ease), color 0.28s var(--blvd-ease), filter 0.28s var(--blvd-ease);
+}
+
+main a.bg-crimson,
+main a[class*="bg-crimson"],
+button[class*="bg-crimson"],
+a.bg-crimson {
+  border-radius: 999px !important;
+  box-shadow: 0 8px 24px -10px rgba(195, 62, 111, 0.65);
+}
+
+main a.bg-crimson:hover,
+main a[class*="bg-crimson"]:hover,
+button[class*="bg-crimson"]:hover,
+a.bg-crimson:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: 0 14px 32px -10px rgba(195, 62, 111, 0.75);
+}
+
+a.rounded-full,
+button.rounded-full {
+  transition: transform 0.28s var(--blvd-ease), background 0.28s var(--blvd-ease), border-color 0.28s var(--blvd-ease), color 0.28s var(--blvd-ease);
+}
+
+a.rounded-full:hover,
+button.rounded-full:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--color-gold) 55%, white) !important;
+}
+
+/* Board / gallery buttons */
+button[class*="لوحة"],
+main button {
+  transition: transform 0.25s var(--blvd-ease), box-shadow 0.25s var(--blvd-ease), background 0.25s var(--blvd-ease), color 0.25s var(--blvd-ease), border-color 0.25s var(--blvd-ease);
+}
+
+/* Soft card hover when bordered */
+@media (hover: hover) {
+  main .border.border-line:hover,
+  main [class*="border-line"].bg-paper-2:hover,
+  main .portrait:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--blvd-shadow-hover);
+    border-color: color-mix(in srgb, var(--color-crimson) 40%, var(--color-line)) !important;
+  }
+}
+
+/* Images gentle zoom inside framed portraits */
+.portrait img,
+main img.object-cover {
+  transition: transform 0.6s var(--blvd-ease);
+}
+
+.portrait:hover img,
+a:hover img.object-cover {
+  transform: scale(1.03);
+}
+
+/* Forms */
+input, textarea, select {
+  border-radius: var(--blvd-radius-sm) !important;
+  transition: border-color 0.25s var(--blvd-ease), box-shadow 0.25s var(--blvd-ease);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--blvd-crimson) !important;
+  box-shadow: 0 0 0 3px rgba(195, 62, 111, 0.25);
+}
+
+/* Footer polish */
+footer.border-t {
+  border-top-color: color-mix(in srgb, var(--color-line) 80%, var(--color-crimson)) !important;
+  background: linear-gradient(180deg, transparent, rgba(17, 17, 17, 0.85));
+  margin-top: 1rem;
+}
+
+footer .dossier {
+  padding-block: 2.5rem !important;
+}
+
+footer a[href*="wa.me"] {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(37, 211, 102, 0.08);
+  border: 1px solid rgba(37, 211, 102, 0.28);
+  transition: background 0.25s var(--blvd-ease), transform 0.25s var(--blvd-ease), border-color 0.25s var(--blvd-ease);
+}
+
+footer a[href*="wa.me"]:hover,
+a[href*="wa.me"]:hover {
+  background: rgba(37, 211, 102, 0.16);
+  transform: translateY(-1px);
+  border-color: rgba(37, 211, 102, 0.5);
+}
+
+/* Also style contact-area WhatsApp (not only footer) */
+a[href="https://wa.me/966543333994"] {
+  border-radius: 999px;
+}
+
+/* Section spacing rhythm */
+main > section,
+main section {
+  scroll-margin-top: 5rem;
+}
+
+/* Stats / value chips */
+.latin + *,
+[class*="text-5xl"],
+[class*="text-7xl"] {
+  text-wrap: balance;
+}
+
+/* Plaza / simulate canvases */
+canvas {
+  border-radius: var(--blvd-radius);
+  box-shadow: var(--blvd-shadow);
+}
+
+/* Scroll reveal — keep elements visible for a11y/tests; only ease transform */
+.blvd-reveal {
+  transform: translateY(14px);
+  transition: transform 0.7s var(--blvd-ease), filter 0.7s var(--blvd-ease);
+  filter: saturate(0.92);
+  will-change: transform, filter;
+}
+
+.blvd-reveal.blvd-in {
+  transform: none;
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .blvd-reveal { transform: none !important; filter: none !important; transition: none !important; }
+}
+
+/* Mobile refinements */
+@media (max-width: 767px) {
+  header .dossier {
+    gap: 0.5rem !important;
+    padding-block: 0.65rem !important;
+  }
+  header nav {
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  main .dossier {
+    padding-block: 1.75rem !important;
+  }
+  .font-display.text-5xl,
+  [class*="text-5xl"] {
+    line-height: 1.15 !important;
+  }
+  main .border.border-line,
+  main .portrait {
+    border-radius: var(--blvd-radius-sm) !important;
+  }
+}
+
+/* Print: keep content, drop decorative motion */
+@media print {
+  .blvd-reveal { opacity: 1 !important; transform: none !important; }
+  header { box-shadow: none !important; }
+}
