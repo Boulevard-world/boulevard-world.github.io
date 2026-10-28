@@ -1,0 +1,8 @@
+Spanish landmark photos (Wikimedia Commons), resized for web.
+- heading.webp: Sagrada Família.jpg — Wikimedia Commons
+- card1.webp: Dawn Charles V Palace / Alhambra Granada — Wikimedia Commons
+- card2.webp: Plaza de España (Seville).jpg — Wikimedia Commons
+- card3.webp: Park Güell.jpg — Wikimedia Commons
+- card4.webp: Royal Palace of Madrid.jpg — Wikimedia Commons
+- card5.webp: Mezquita-Catedral de Córdoba.jpg — Wikimedia Commons
+See each file's Commons page for author and license (typically CC BY-SA / CC BY / Public Domain).
