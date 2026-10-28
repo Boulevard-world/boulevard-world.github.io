@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="بوليفارد وورلد">
+  <rect width="32" height="32" rx="7" fill="#14110e"/>
+  <path fill="#a67c3d" fill-rule="evenodd" d="M6 26h20V15A10 10 0 0 0 6 15v11zm4.2 0V16.2a5.8 5.8 0 0 1 11.6 0V26H10.2z"/>
+  <path fill="#8e2a2a" d="M14.2 15.6h3.6V23l-1.8 1.5-1.8-1.5V15.6z"/>
+  <rect x="6" y="25.6" width="20" height="2.4" fill="#f6f1e8"/>
+</svg>

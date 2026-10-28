@@ -1,0 +1,22 @@
+DirectoryIndex index.html
+Options -Indexes
+
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /boulevard-world/
+
+  # Match GitHub Pages: /plaza -> /plaza/
+  RewriteRule ^(plaza|simulate)$ $1/ [R=301,L]
+
+  # Existing file or directory: serve it (do not fall through to WordPress)
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # SPA fallback within this subfolder only
+  RewriteRule ^ index.html [L]
+</IfModule>
