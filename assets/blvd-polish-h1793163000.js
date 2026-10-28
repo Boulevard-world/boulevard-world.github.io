@@ -69,11 +69,16 @@
     // Soft header elevation on scroll
     const header = document.querySelector('header.sticky, header.no-print');
     if (header) {
+      let __blvdScrollRaf = 0;
       const onScroll = () => {
-        header.style.boxShadow =
-          window.scrollY > 8
-            ? '0 12px 36px -18px rgba(0,0,0,0.9), 0 0 0 1px rgba(195,62,111,0.12)'
-            : '';
+        if (__blvdScrollRaf) return;
+        __blvdScrollRaf = requestAnimationFrame(() => {
+          __blvdScrollRaf = 0;
+          header.style.boxShadow =
+            window.scrollY > 8
+              ? '0 12px 36px -18px rgba(0,0,0,0.9), 0 0 0 1px rgba(195,62,111,0.12)'
+              : '';
+        });
       };
       onScroll();
       window.addEventListener('scroll', onScroll, { passive: true });
@@ -95,38 +100,66 @@
     reapply();
     return r;
   };
-
+})();
 
 (function(){
   var TITLE='أسبانيا', SUB='منطقة أسبانيا';
+  var __blvdHeroBusy=false;
+  var __blvdHeroRaf=0;
+  var __blvdHeroMo=null;
+  var __blvdHeroDone=false;
   function build(){
     var wrap=document.createElement('div');
     wrap.className='blvd-hero-spain';
     wrap.setAttribute('data-blvd-hero','1');
+    wrap.setAttribute('data-react-exempt','1');
+    wrap.style.cssText='opacity:1;visibility:visible;background:#1f1f22;color:#fff;position:relative;z-index:5;padding:0.85rem 1rem;border-radius:0.75rem;';
     var t=document.createElement('p');
     t.className='blvd-hero-spain-title';
     t.textContent=TITLE;
+    t.style.cssText='opacity:1;visibility:visible;color:#ffffff;-webkit-text-fill-color:#ffffff;font-weight:800;margin:0;';
     var s=document.createElement('p');
     s.className='blvd-hero-spain-sub';
     s.textContent=SUB;
+    s.style.cssText='opacity:1;visibility:visible;color:#e9e9e9;-webkit-text-fill-color:#e9e9e9;font-weight:700;margin:0.35rem 0 0;';
     wrap.appendChild(t); wrap.appendChild(s);
     return wrap;
   }
+  function paint(el){
+    if(!el) return;
+    if(el.style.opacity!=='1') el.style.opacity='1';
+    if(el.style.visibility!=='visible') el.style.visibility='visible';
+    if(el.style.background!=='#1f1f22'){ el.style.background='#1f1f22'; el.style.backgroundColor='#1f1f22'; }
+    if(el.style.color!=='#ffffff' && el.style.color!=='rgb(255, 255, 255)') el.style.color='#ffffff';
+    el.classList.remove('blvd-reveal');
+    var tt=el.querySelector('.blvd-hero-spain-title');
+    var ss=el.querySelector('.blvd-hero-spain-sub');
+    if(tt){
+      if(tt.textContent!==TITLE) tt.textContent=TITLE;
+      tt.style.opacity='1'; tt.style.visibility='visible';
+      tt.style.color='#ffffff'; tt.style.webkitTextFillColor='#ffffff';
+    }
+    if(ss){
+      if(ss.textContent!==SUB) ss.textContent=SUB;
+      ss.style.opacity='1'; ss.style.visibility='visible';
+      ss.style.color='#e9e9e9'; ss.style.webkitTextFillColor='#e9e9e9';
+    }
+  }
   function ensure(){
+    if(__blvdHeroBusy || __blvdHeroDone) return;
+    __blvdHeroBusy=true;
     try{
+      if(__blvdHeroMo){ try{ __blvdHeroMo.disconnect(); }catch(e){} }
       var existing=document.querySelector('.blvd-hero-spain');
       if(existing){
-        var tt=existing.querySelector('.blvd-hero-spain-title');
-        var ss=existing.querySelector('.blvd-hero-spain-sub');
-        if(tt){ tt.textContent=TITLE; tt.style.opacity='1'; tt.style.visibility='visible'; }
-        if(ss){ ss.textContent=SUB; ss.style.opacity='1'; ss.style.visibility='visible'; }
-        existing.style.opacity='1'; existing.style.visibility='visible';
-        existing.classList.remove('blvd-reveal');
+        paint(existing);
+        __blvdHeroDone=true;
+        if(__blvdHeroMo){ try{ __blvdHeroMo.disconnect(); __blvdHeroMo=null; }catch(e){} }
         return;
       }
       var main=document.querySelector('main#top, main');
       if(!main) return;
-      var col=main.querySelector('.md\\:col-span-7, [class*="col-span-7"]') || main.querySelector('section .dossier > div, section > div');
+      // Prefer insert OUTSIDE React-managed first child when possible: after main's first section kicker
       var kicker=null;
       var nodes=main.querySelectorAll('p');
       for(var i=0;i<nodes.length;i++){
@@ -135,22 +168,49 @@
       var wrap=build();
       if(kicker && kicker.parentNode){
         kicker.parentNode.insertBefore(wrap, kicker);
-      } else if(col){
-        col.insertBefore(wrap, col.firstChild);
+      } else {
+        var col=main.querySelector('[class*="col-span-7"]') || main.querySelector('section > div');
+        if(col) col.insertBefore(wrap, col.firstChild);
+        else return;
       }
+      __blvdHeroDone=true;
+      if(__blvdHeroMo){ try{ __blvdHeroMo.disconnect(); __blvdHeroMo=null; }catch(e){} }
+    }catch(e){}
+    finally{
+      __blvdHeroBusy=false;
+      // Only re-observe if not done yet (main not ready)
+      if(!__blvdHeroDone && __blvdHeroMo){
+        try{ __blvdHeroMo.observe(document.documentElement,{childList:true,subtree:true}); }catch(e){}
+      }
+    }
+  }
+  function schedule(){
+    if(__blvdHeroRaf || __blvdHeroDone) return;
+    __blvdHeroRaf=requestAnimationFrame(function(){
+      __blvdHeroRaf=0;
+      ensure();
+    });
+  }
+  // AFTER hydration: wait for window load, then two rAFs + short timeout
+  function startAfterHydration(){
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        setTimeout(schedule, 0);
+        setTimeout(schedule, 200);
+        setTimeout(schedule, 800);
+        setTimeout(schedule, 2000);
+      });
+    });
+    try{
+      __blvdHeroMo=new MutationObserver(function(){ if(!__blvdHeroDone) schedule(); });
+      // Delay observing until after hydrate window
+      setTimeout(function(){
+        if(__blvdHeroDone || !__blvdHeroMo) return;
+        try{ __blvdHeroMo.observe(document.documentElement,{childList:true,subtree:true}); }catch(e){}
+      }, 600);
+      setTimeout(function(){ try{ if(__blvdHeroMo){ __blvdHeroMo.disconnect(); __blvdHeroMo=null; } }catch(e){} }, 6000);
     }catch(e){}
   }
-  ensure();
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', ensure);
-  setTimeout(ensure, 0);
-  setTimeout(ensure, 250);
-  setTimeout(ensure, 1000);
-  setTimeout(ensure, 2500);
-  try{
-    var mo=new MutationObserver(function(){ ensure(); });
-    mo.observe(document.documentElement,{childList:true,subtree:true});
-    setTimeout(function(){ try{mo.disconnect();}catch(e){} }, 8000);
-  }catch(e){}
-})();
-
+  if(document.readyState==='complete') startAfterHydration();
+  else window.addEventListener('load', startAfterHydration);
 })();

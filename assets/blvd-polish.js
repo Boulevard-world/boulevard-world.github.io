@@ -107,10 +107,12 @@
   var __blvdHeroBusy=false;
   var __blvdHeroRaf=0;
   var __blvdHeroMo=null;
+  var __blvdHeroDone=false;
   function build(){
     var wrap=document.createElement('div');
     wrap.className='blvd-hero-spain';
     wrap.setAttribute('data-blvd-hero','1');
+    wrap.setAttribute('data-react-exempt','1');
     wrap.style.cssText='opacity:1;visibility:visible;background:#1f1f22;color:#fff;position:relative;z-index:5;padding:0.85rem 1rem;border-radius:0.75rem;';
     var t=document.createElement('p');
     t.className='blvd-hero-spain-title';
@@ -127,37 +129,37 @@
     if(!el) return;
     if(el.style.opacity!=='1') el.style.opacity='1';
     if(el.style.visibility!=='visible') el.style.visibility='visible';
-    if(el.style.backgroundColor!=='rgb(31, 31, 34)' && el.style.background!=='#1f1f22'){
-      el.style.background='#1f1f22'; el.style.backgroundColor='#1f1f22';
-    }
-    if(el.style.color!=='rgb(255, 255, 255)' && el.style.color!=='#ffffff') el.style.color='#ffffff';
+    if(el.style.background!=='#1f1f22'){ el.style.background='#1f1f22'; el.style.backgroundColor='#1f1f22'; }
+    if(el.style.color!=='#ffffff' && el.style.color!=='rgb(255, 255, 255)') el.style.color='#ffffff';
     el.classList.remove('blvd-reveal');
     var tt=el.querySelector('.blvd-hero-spain-title');
     var ss=el.querySelector('.blvd-hero-spain-sub');
     if(tt){
       if(tt.textContent!==TITLE) tt.textContent=TITLE;
-      if(tt.style.opacity!=='1') tt.style.opacity='1';
-      if(tt.style.visibility!=='visible') tt.style.visibility='visible';
-      if(tt.style.color!=='#ffffff' && tt.style.color!=='rgb(255, 255, 255)') tt.style.color='#ffffff';
-      tt.style.webkitTextFillColor='#ffffff';
+      tt.style.opacity='1'; tt.style.visibility='visible';
+      tt.style.color='#ffffff'; tt.style.webkitTextFillColor='#ffffff';
     }
     if(ss){
       if(ss.textContent!==SUB) ss.textContent=SUB;
-      if(ss.style.opacity!=='1') ss.style.opacity='1';
-      if(ss.style.visibility!=='visible') ss.style.visibility='visible';
-      if(ss.style.color!=='#e9e9e9' && ss.style.color!=='rgb(233, 233, 233)') ss.style.color='#e9e9e9';
-      ss.style.webkitTextFillColor='#e9e9e9';
+      ss.style.opacity='1'; ss.style.visibility='visible';
+      ss.style.color='#e9e9e9'; ss.style.webkitTextFillColor='#e9e9e9';
     }
   }
   function ensure(){
-    if(__blvdHeroBusy) return;
+    if(__blvdHeroBusy || __blvdHeroDone) return;
     __blvdHeroBusy=true;
     try{
       if(__blvdHeroMo){ try{ __blvdHeroMo.disconnect(); }catch(e){} }
       var existing=document.querySelector('.blvd-hero-spain');
-      if(existing){ paint(existing); return; }
+      if(existing){
+        paint(existing);
+        __blvdHeroDone=true;
+        if(__blvdHeroMo){ try{ __blvdHeroMo.disconnect(); __blvdHeroMo=null; }catch(e){} }
+        return;
+      }
       var main=document.querySelector('main#top, main');
       if(!main) return;
+      // Prefer insert OUTSIDE React-managed first child when possible: after main's first section kicker
       var kicker=null;
       var nodes=main.querySelectorAll('p');
       for(var i=0;i<nodes.length;i++){
@@ -169,31 +171,46 @@
       } else {
         var col=main.querySelector('[class*="col-span-7"]') || main.querySelector('section > div');
         if(col) col.insertBefore(wrap, col.firstChild);
+        else return;
       }
+      __blvdHeroDone=true;
+      if(__blvdHeroMo){ try{ __blvdHeroMo.disconnect(); __blvdHeroMo=null; }catch(e){} }
     }catch(e){}
     finally{
       __blvdHeroBusy=false;
-      if(__blvdHeroMo){
+      // Only re-observe if not done yet (main not ready)
+      if(!__blvdHeroDone && __blvdHeroMo){
         try{ __blvdHeroMo.observe(document.documentElement,{childList:true,subtree:true}); }catch(e){}
       }
     }
   }
   function schedule(){
-    if(__blvdHeroRaf) return;
+    if(__blvdHeroRaf || __blvdHeroDone) return;
     __blvdHeroRaf=requestAnimationFrame(function(){
       __blvdHeroRaf=0;
       ensure();
     });
   }
-  ensure();
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', schedule);
-  setTimeout(schedule, 0);
-  setTimeout(schedule, 250);
-  setTimeout(schedule, 1000);
-  setTimeout(schedule, 2500);
-  try{
-    __blvdHeroMo=new MutationObserver(function(){ schedule(); });
-    __blvdHeroMo.observe(document.documentElement,{childList:true,subtree:true});
-    setTimeout(function(){ try{ if(__blvdHeroMo) __blvdHeroMo.disconnect(); __blvdHeroMo=null; }catch(e){} }, 8000);
-  }catch(e){}
+  // AFTER hydration: wait for window load, then two rAFs + short timeout
+  function startAfterHydration(){
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        setTimeout(schedule, 0);
+        setTimeout(schedule, 200);
+        setTimeout(schedule, 800);
+        setTimeout(schedule, 2000);
+      });
+    });
+    try{
+      __blvdHeroMo=new MutationObserver(function(){ if(!__blvdHeroDone) schedule(); });
+      // Delay observing until after hydrate window
+      setTimeout(function(){
+        if(__blvdHeroDone || !__blvdHeroMo) return;
+        try{ __blvdHeroMo.observe(document.documentElement,{childList:true,subtree:true}); }catch(e){}
+      }, 600);
+      setTimeout(function(){ try{ if(__blvdHeroMo){ __blvdHeroMo.disconnect(); __blvdHeroMo=null; } }catch(e){} }, 6000);
+    }catch(e){}
+  }
+  if(document.readyState==='complete') startAfterHydration();
+  else window.addEventListener('load', startAfterHydration);
 })();
