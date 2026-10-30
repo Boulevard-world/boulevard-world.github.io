@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://boulevard-world.github.io/sitemap.xml
