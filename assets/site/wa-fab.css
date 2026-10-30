@@ -1,0 +1,30 @@
+#blvd-wa-fab{
+  position:fixed!important;
+  left:16px!important;right:auto!important;
+  bottom:20px!important;top:auto!important;
+  transform:none!important;
+  z-index:99990!important;
+  width:64px!important;height:64px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  border-radius:50%!important;background:#25D366!important;color:#fff!important;
+  border:none!important;
+  box-shadow:0 8px 28px rgba(37,211,102,.55),0 2px 10px rgba(0,0,0,.4)!important;
+  text-decoration:none!important;margin:0!important;padding:0!important;cursor:pointer!important;
+  animation:blvdWaPulse 2.2s ease-in-out infinite!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+#blvd-wa-fab svg{width:34px!important;height:34px!important;display:block!important;fill:#fff!important;pointer-events:none!important}
+#blvd-wa-fab:hover,#blvd-wa-fab:focus-visible{
+  transform:scale(1.1)!important;outline:2px solid #fff!important;outline-offset:3px!important;
+}
+@keyframes blvdWaPulse{
+  0%,100%{box-shadow:0 8px 28px rgba(37,211,102,.55),0 2px 10px rgba(0,0,0,.4),0 0 0 0 rgba(37,211,102,.4)}
+  50%{box-shadow:0 8px 28px rgba(37,211,102,.55),0 2px 10px rgba(0,0,0,.4),0 0 0 12px rgba(37,211,102,0)}
+}
+@media (max-width:480px){
+  #blvd-wa-fab{width:58px!important;height:58px!important;left:12px!important;bottom:16px!important}
+  #blvd-wa-fab svg{width:30px!important;height:30px!important}
+}
+@media (prefers-reduced-motion:reduce){#blvd-wa-fab{animation:none!important}}
+/* Do not sit on top of lightbox */
+html.bw-lb-open #blvd-wa-fab{visibility:hidden!important;pointer-events:none!important}
