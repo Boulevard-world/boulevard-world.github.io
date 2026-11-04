@@ -1,6 +1,6 @@
 # boulevard-world.github.io
 
-Mirror of the Boulevard World Spain leasing dossier (static).
+Boulevard World leasing hub (static): Mexico, Portugal and Italy zone dossiers.
 
 **Live:** https://boulevard-world.github.io/
 

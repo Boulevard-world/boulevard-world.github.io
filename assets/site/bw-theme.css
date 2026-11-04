@@ -248,7 +248,7 @@ html.ev-nav-open{overflow:hidden}
 .ev-main{min-height:60vh}
 
 
-/* Shared Spain–Portugal plan notice */
+/* Shared plan notice */
 .bw-shared-plan {
   border: 1px solid rgba(201, 169, 106, 0.45);
   background: rgba(201, 169, 106, 0.08);
@@ -261,7 +261,7 @@ html.ev-nav-open{overflow:hidden}
 /* Prevent layout jump when lightbox locks scroll */
 html:has(body.bw-site), body.bw-site{scrollbar-gutter:stable}
 html.bw-lb-open, html.bw-lb-open body{overflow:hidden!important}
-/* Fixed overlay lightbox (Italy/Spain) — no page shift behind */
+/* Fixed overlay lightbox (zone pages) — no page shift behind */
 body.bw-site .bw-lightbox,
 body.bw-site dialog.bw-lightbox{
   position:fixed;inset:0;z-index:10000;
